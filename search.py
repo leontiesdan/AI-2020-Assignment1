@@ -158,7 +158,7 @@ def randomSearch(problem):
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-     from game import Directions
+    from game import Directions
     directionTable = {'South': Directions.SOUTH, 'North': Directions.NORTH,
                       'West': Directions.WEST, 'East': Directions.EAST}
 
