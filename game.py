@@ -620,6 +620,7 @@ class Game:
                         start_time = time.time()
                         timed_func(self.state.deepCopy())
                     except TimeoutFunctionException:
+                        print "Out of time\n"
                         #print('You have run out of compute time! You exceeded {:.3f}s of compute'.format(self.state.data.score / SCALING_FACTOR))
                         self.state.data.score = 0
                         self.state.data._lose = True
@@ -722,12 +723,12 @@ class Game:
                 move_time = time.time() - start_time
             self.unmute()
 
-            self.state.data.score += -move_time * SCALING_FACTOR
-            if self.state.data.score <= 0:
-                self.state.data.score = 0
-                self.state.data._lose = True
-                self.rules.process(self.state, self)
-                continue
+#            self.state.data.score += -move_time * SCALING_FACTOR
+#            if self.state.data.score <= 0:
+#                self.state.data.score = 0
+#                self.state.data._lose = True
+#                self.rules.process(self.state, self)
+#                continue
 
             # Execute the action
             self.moveHistory.append( (agentIndex, action) )
