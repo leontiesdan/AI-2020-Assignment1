@@ -270,8 +270,8 @@ class PacmanGraphics:
         endpoints = self.getEndpoints(self.getDirection(pacman))
 
         width = PACMAN_OUTLINE_WIDTH
-        outlineColor = PACMAN_COLOR
-        fillColor = PACMAN_COLOR
+        outlineColor = GHOST_COLORS[index % len(GHOST_COLORS)]
+        fillColor = GHOST_COLORS[index % len(GHOST_COLORS)]
 
         if self.capture:
             outlineColor = TEAM_COLORS[index % 2]
