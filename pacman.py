@@ -111,6 +111,7 @@ class GameState:
         # Time passes
         if agentIndex < self.data.numPacmanAgents:
             state.data.scoreChange += - 0.4 * TIME_PENALTY # Penalty for waiting around
+            state.data.pacmanScoresChange[agentIndex] += -0.4 * TIME_PENALTY
         else:
             GhostRules.decrementTimer( state.data.agentStates[agentIndex] )
 
@@ -121,6 +122,7 @@ class GameState:
         # Book keeping
         state.data._agentMoved = agentIndex
         state.data.score += state.data.scoreChange
+        state.data.pacmanScores[agentIndex] += state.data.pacmanScoresChange[agentIndex]
         GameState.explored.add(self)
         GameState.explored.add(state)
         return state
@@ -320,7 +322,7 @@ class ClassicGameRules:
         game.gameOver = True
 
     def lose( self, state, game ):
-        if not self.quiet: print ("Pacman emerges victorious! Score: %d" % state.data.score)
+        if not self.quiet: print ("Pacman does not emerge victorious! Score: %d" % state.data.score)
         game.gameOver = True
 
     def getProgress(self, game):
@@ -381,13 +383,14 @@ class PacmanRules:
         nearest = nearestPoint( next )
         if manhattanDistance( nearest, next ) <= 0.5 :
             # Remove food
-            PacmanRules.consume( nearest, state )
+            PacmanRules.consume( nearest, state, agentIndex )
     applyAction = staticmethod( applyAction )
 
-    def consume( position, state ):
+    def consume( position, state, agentIndex ):
         x,y = position
         # Eat food
         if state.data.food[x][y]:
+            state.data.pacmanScoresChange[agentIndex] += 10
             state.data.scoreChange += 10
             state.data.food = state.data.food.copy()
             state.data.food[x][y] = False
@@ -710,6 +713,11 @@ def runGames( layout, pacmen, ghosts, display, numGames, record, numTraining = 0
             f.close()
 
     if (numGames-numTraining) > 0:
+        file = open("MyFile.txt", "a")  
+        for game in games:
+            for i in range (game.state.getNumPacmanAgents()):
+                file.write("Pacman number %d score: %d\n" % (i, game.state.data.pacmanScores[i]) )
+        file.close()
         scores = [game.state.getScore() for game in games]
         wins = [game.state.isWin() for game in games]
         winRate = wins.count(True)/ float(len(wins))
@@ -717,6 +725,7 @@ def runGames( layout, pacmen, ghosts, display, numGames, record, numTraining = 0
         print('Scores:       ', ', '.join([str(score) for score in scores]))
         print('Win Rate:      %d/%d (%.2f)' % (wins.count(True), len(wins), winRate))
         print('Record:       ', ', '.join([ ['Loss', 'Win'][int(w)] for w in wins]))
+
 
 
     return games

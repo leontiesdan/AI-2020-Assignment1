@@ -135,6 +135,7 @@ class AgentState:
         self.scaredTimer = 0
         self.numCarrying = 0
         self.numReturned = 0
+        self.score = 0
 
     def __str__( self ):
         if self.isPacman:
@@ -391,6 +392,9 @@ class GameStateData:
             self.score = prevState.score
             self.numGhostAgents = prevState.numGhostAgents
             self.numPacmanAgents = prevState.numPacmanAgents
+            self.pacmanScores = prevState.pacmanScores
+            self.pacmanScoresChange = prevState.pacmanScoresChange
+
 
         self._foodEaten = None
         self._foodAdded = None
@@ -399,6 +403,7 @@ class GameStateData:
         self._lose = False
         self._win = False
         self.scoreChange = 0
+
 
     def deepCopy( self ):
         state = GameStateData( self )
@@ -505,6 +510,8 @@ class GameStateData:
 
         self.numPacmanAgents = numPacAgents
         self.numGhostAgents = numGhostAgents
+        self.pacmanScores = [0] * numPacAgents
+        self.pacmanScoresChange = [0] * numPacAgents
 
         self.agentStates = []
         numGhosts = 0
