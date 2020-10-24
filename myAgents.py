@@ -72,7 +72,16 @@ class ClosestDotAgent(Agent):
 
         "*** YOUR CODE HERE ***"
         #util.raiseNotDefined()
-        return search.aStarSearch(problem)
+        if self.index ==0:
+            return search.breadthFirstSearch(problem)
+        elif self.index ==1:
+            return search.aStarSearch(problem)
+        elif self.index ==2:
+            return search.depthFirstSearch(problem)
+        elif self.index ==3:
+            return search.uniformCostSearch(problem)
+        elif self.index ==4:
+            return search.randomSearch(problem)
 
     def getAction(self, state):
         return self.findPathToClosestDot(state)[0]

@@ -87,29 +87,35 @@ def depthFirstSearch(problem):
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
     "*** YOUR CODE HERE ***"
-    print("Start:", problem.getStartState())
-    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
-    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
+    #print("Start:", problem.getStartState())
+    #print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
+    #print("Start's successors:", problem.getSuccessors(problem.getStartState()))
+    from game import Directions
+    directionTable = {'South': Directions.SOUTH, 'North': Directions.NORTH,
+                      'West': Directions.WEST, 'East': Directions.EAST}
 
-    state= problem.getStartState()
-    curentPath=[]
-    frontier= util.Stack()
-    frontier.push((state,[]))
-    vistited=[]
-    while not problem.isGoalState(state):
-     
-      
-        vistited.append(state)
-        successors = problem.getSuccessors(state)
-        for state,direction,_  in successors:
-            if(state not in vistited):
-                newPath = curentPath+ [direction]
-                
-                frontier.push((state,newPath))
-        
-        state,curentPath=frontier.pop()
-    return curentPath
-    #util.raiseNotDefined()
+    # create a Stack to keep track of nodes we are going to explore
+    myStack = util.Stack()
+
+    done = set()  #to keep track or explored nodes
+
+    startPoint = problem.startingState()
+
+    #we will push in tuples (coordinates, pass) in the stack
+    myStack.push((startPoint, []))
+
+    while not myStack.isEmpty():
+      nextNode = myStack.pop()
+      coordinate = nextNode[0]
+      newPass = nextNode[1]
+
+      if problem.isGoal(coordinate):
+          return newPass
+      if coordinate not in done:
+          done.add(coordinate)
+          for k in problem.successorStates(coordinate):
+              if k[0] not in done:
+                  myStack.push((k[0], newPass + [directionTable[k[1]]]))
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
@@ -152,7 +158,35 @@ def randomSearch(problem):
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+     from game import Directions
+    directionTable = {'South': Directions.SOUTH, 'North': Directions.NORTH,
+                      'West': Directions.WEST, 'East': Directions.EAST}
+
+    # create a Queue to keep track of nodes we are going to explore
+    myQueue = util.PriorityQueue()
+
+    done = set()  #to keep track or explored nodes
+
+    startPoint = problem.startingState()
+
+    #we will push in the queue tuples (coordinates, pass)
+    #thus, we do not need additional dictionary for the passes (as we have in DFS)
+    myQueue.push((startPoint, []), 0)
+
+    while not myQueue.isEmpty():
+      nextNode = myQueue.pop()
+      coordinate = nextNode[0]
+      newPass = nextNode[1]
+
+      if problem.isGoal(coordinate):
+          return newPass
+      if coordinate not in done:
+          done.add(coordinate)
+          for k in problem.successorStates(coordinate):
+              if k[0] not in done:
+                  #we need to calculate a new priority
+                  cost = problem.actionsCost(newPass + [directionTable[k[1]]])
+                  myQueue.push((k[0], newPass + [directionTable[k[1]]]), cost)
 
 def nullHeuristic(state, problem=None):
     """
