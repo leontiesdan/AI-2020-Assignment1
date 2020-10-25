@@ -72,50 +72,35 @@ def tinyMazeSearch(problem):
     w = Directions.WEST
     return  [s, s, w, s, w, w, s, w]
 
+
 def depthFirstSearch(problem):
-    """
-    Search the deepest nodes in the search tree first.
+    # we tried, but it doesn't work :( 
 
-    Your search algorithm needs to return a list of actions that reaches the
-    goal. Make sure to implement a graph search algorithm.
+    state = problem.getStartState()
+    visitedNodes = dict()
+    action = []
+    DFS(problem, state, action, visitedNodes)
+    return action
 
-    To get started, you might want to try some of these simple commands to
-    understand the search problem that is being passed in:
+def DFS(problem, state, action, visitedNodes):
+    if not problem.visitedNodes.has_key(hash(state[0])):
+        problem.visitedNodes[hash(state[0])] = state[0]
+        
+    if problem.isGoalState(state):
+        return True
 
-    print "Start:", problem.getStartState()
-    print "Is the start a goal?", problem.isGoalState(problem.getStartState())
-    print "Start's successors:", problem.getSuccessors(problem.getStartState())
-    """
-    "*** YOUR CODE HERE ***"
-    #print("Start:", problem.getStartState())
-    #print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
-    #print("Start's successors:", problem.getSuccessors(problem.getStartState()))
-    from game import Directions
-    directionTable = {'South': Directions.SOUTH, 'North': Directions.NORTH,
-                      'West': Directions.WEST, 'East': Directions.EAST}
+    for child in problem.getSuccessors(state):
+        problem.expandedAccumulator += problem._expanded
 
-    # create a Stack to keep track of nodes we are going to explore
-    myStack = util.Stack()
+        state = child[0]
+        if not problem.visitedNodes.has_key(hash(state)):
+            problem.visitedNodes[hash(state)] = state
+            action.append(child[1])
+            if DFS(problem, state, action, visitedNodes) == True:
+                return True
+            action.pop()
+    return False
 
-    done = set()  #to keep track or explored nodes
-
-    startPoint = problem.startingState()
-
-    #we will push in tuples (coordinates, pass) in the stack
-    myStack.push((startPoint, []))
-
-    while not myStack.isEmpty():
-      nextNode = myStack.pop()
-      coordinate = nextNode[0]
-      newPass = nextNode[1]
-
-      if problem.isGoal(coordinate):
-          return newPass
-      if coordinate not in done:
-          done.add(coordinate)
-          for k in problem.successorStates(coordinate):
-              if k[0] not in done:
-                  myStack.push((k[0], newPass + [directionTable[k[1]]]))
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
@@ -136,6 +121,7 @@ def breadthFirstSearch(problem):
         if problem.isGoalState(head):
             return path
         for succ, action, cost in problem.getSuccessors(head):
+            problem.expandedAccumulator += problem._expanded
             if succ not in visited:
                 if succ not in (item[0] for item in frontier.list):
                     frontier.push((succ, path + [action]))
@@ -149,6 +135,8 @@ def randomSearch(problem):
 
     while not problem.isGoalState(state):
         successors = problem.getSuccessors(state)
+        problem.expandedAccumulator += problem._expanded
+
         successor = random.choice(successors)
         state = successor[0]
         sol.append(successor[1])
@@ -158,35 +146,39 @@ def randomSearch(problem):
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    from game import Directions
-    directionTable = {'South': Directions.SOUTH, 'North': Directions.NORTH,
-                      'West': Directions.WEST, 'East': Directions.EAST}
+    def cost_function(node): return node[2]
 
-    # create a Queue to keep track of nodes we are going to explore
-    myQueue = util.PriorityQueue()
+    frontier = util.PriorityQueueWithFunction(cost_function)
 
-    done = set()  #to keep track or explored nodes
+    explored = set()
 
-    startPoint = problem.startingState()
+    # Node: (state, action, cost, parent)
+    frontier.push((problem.getStartState(), None, 0, None))
 
-    #we will push in the queue tuples (coordinates, pass)
-    #thus, we do not need additional dictionary for the passes (as we have in DFS)
-    myQueue.push((startPoint, []), 0)
+    while not frontier.isEmpty():
+        node = frontier.pop()
+        state = node[0]
+        cost = node[2]
 
-    while not myQueue.isEmpty():
-      nextNode = myQueue.pop()
-      coordinate = nextNode[0]
-      newPass = nextNode[1]
+        if state in explored:
+            continue
 
-      if problem.isGoal(coordinate):
-          return newPass
-      if coordinate not in done:
-          done.add(coordinate)
-          for k in problem.successorStates(coordinate):
-              if k[0] not in done:
-                  #we need to calculate a new priority
-                  cost = problem.actionsCost(newPass + [directionTable[k[1]]])
-                  myQueue.push((k[0], newPass + [directionTable[k[1]]]), cost)
+        explored.add(state)
+
+        if problem.isGoalState(state):
+            path = []
+            while node[3] is not None:
+                path = path + [node[1]]
+                node = node[3]
+            path.reverse()
+            return path
+
+        for child_state, child_action, child_cost in problem.getSuccessors(state):
+            problem.expandedAccumulator += problem._expanded
+            if child_state not in explored:
+                frontier.push((child_state, child_action, cost + child_cost, node))
+
+    return False
 
 def nullHeuristic(state, problem=None):
     """
@@ -222,6 +214,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
             goal = True
             break
         for elem in problem.getSuccessors(node[0]):
+            problem.expandedAccumulator += problem._expanded
             if elem[0] not in visited.keys():
                 priority = node[2] + elem[2] + heuristic(elem[0], problem)
                 if elem[0] in cost.keys():

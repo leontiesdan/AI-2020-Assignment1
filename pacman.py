@@ -123,6 +123,7 @@ class GameState:
         state.data._agentMoved = agentIndex
         state.data.score += state.data.scoreChange
         state.data.pacmanScores[agentIndex] += state.data.pacmanScoresChange[agentIndex]
+        state.data.nodesExpanded[agentIndex] += state.data.nodesExpandedChange[agentIndex]
         GameState.explored.add(self)
         GameState.explored.add(state)
         return state
@@ -526,7 +527,7 @@ def readCommand( argv ):
                       metavar='LAYOUT_FILE', default='test51')
     parser.add_option('-p', '--pacman', dest='pacman',
                       help=default('the agent TYPE in the pacmanAgents module to use'),
-                      metavar='TYPE', default='myAgents.py')
+                      metavar='TYPE', default='searchAgents.py')
     parser.add_option('-t', '--textGraphics', action='store_true', dest='textGraphics',
                       help='Display output as text only', default=False)
     parser.add_option('-q', '--quietTextGraphics', action='store_true', dest='quietGraphics',
@@ -717,6 +718,7 @@ def runGames( layout, pacmen, ghosts, display, numGames, record, numTraining = 0
         for game in games:
             for i in range (game.state.getNumPacmanAgents()):
                 file.write("Pacman number %d score: %d\n" % (i, game.state.data.pacmanScores[i]) )
+                file.write("Pacman number %d nodes expanded: %d\n" % (i, game.state.data.nodesExpanded[i]))
         file.close()
         scores = [game.state.getScore() for game in games]
         wins = [game.state.isWin() for game in games]

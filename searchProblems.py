@@ -105,9 +105,11 @@ class PositionSearchProblem(search.SearchProblem):
          required to get there, and 'stepCost' is the incremental
          cost of expanding to that successor
         """
-
+        import random 
         successors = []
-        for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
+        directions = [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]
+        random.shuffle(directions)
+        for action in directions:
             x,y = state
             dx, dy = Actions.directionToVector(action)
             nextx, nexty = int(x + dx), int(y + dy)

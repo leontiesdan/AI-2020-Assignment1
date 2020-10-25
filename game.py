@@ -394,6 +394,9 @@ class GameStateData:
             self.numPacmanAgents = prevState.numPacmanAgents
             self.pacmanScores = prevState.pacmanScores
             self.pacmanScoresChange = prevState.pacmanScoresChange
+            self.nodesExpanded = prevState.nodesExpanded
+            self.nodesExpandedChange = prevState.nodesExpandedChange
+            self.visitedNodesDfs = prevState.visitedNodesDfs
 
 
         self._foodEaten = None
@@ -512,6 +515,9 @@ class GameStateData:
         self.numGhostAgents = numGhostAgents
         self.pacmanScores = [0] * numPacAgents
         self.pacmanScoresChange = [0] * numPacAgents
+        self.nodesExpanded = [0] * numPacAgents
+        self.nodesExpandedChange = [0] * numPacAgents
+        self.visitedNodesDfs = dict()
 
         self.agentStates = []
         numGhosts = 0
